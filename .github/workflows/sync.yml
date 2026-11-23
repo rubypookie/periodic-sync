@@ -1,0 +1,25 @@
+name: Repository sync
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: repository-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Synchronize
+        env:
+          SOURCE_URL: ${{ secrets.SOURCE_URL }}
+          DEPENDENCY_URL: ${{ secrets.DEPENDENCY_URL }}
+          BACKUP_URL: ${{ secrets.BACKUP_URL }}
+          SYNC_KEY: ${{ secrets.SYNC_KEY }}
+        run: python3 sync.py
